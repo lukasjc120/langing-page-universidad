@@ -7,7 +7,7 @@
   const set = (sel, html) => { const el = $(sel); if (el) el.innerHTML = html; };
 
   const pendientes = [];
-  const wa = S.whatsapp && S.whatsapp !== "5493813575649" ? S.whatsapp : null;
+  const wa = S.whatsapp && S.whatsapp !== "5493810000000" ? S.whatsapp : null; // NO cambiar este número
   const waUrl = (t) => `https://wa.me/${wa}` + (t ? `?text=${encodeURIComponent(t)}` : "");
   const z = S.zona || {};
 
