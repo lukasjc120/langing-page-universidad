@@ -9,7 +9,7 @@ window.SITE = {
 
   /* WhatsApp: 54 + 9 + código de área (sin 0) + número (sin 15).
      Sin +, espacios ni guiones. Ejemplo: "5493811234567" */
-  whatsapp: "5493813575649",
+  whatsapp: "3813575649",
   mensajeWhatsapp: "Hola Paola, quisiera consultar por las clases de Química.",
 
   /* Correo (opcional). Si lo completás, aparece el botón "Enviar por correo". */
