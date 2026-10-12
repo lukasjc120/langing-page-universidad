@@ -86,7 +86,7 @@
   $("#year").textContent = new Date().getFullYear();
 
   /* ---------- Formulario ---------- */
-  const form = $("#contactForm"), msg = $("#formMsg"), mailBtn = $("#mailBtn");
+  const form = $("#contactForm"), msg = $("#formMsg"), sendBtn = $("#sendBtn");
   const datos = (estricto) => {
     const d = new FormData(form), g = (k) => (d.get(k) || "").toString().trim();
     const o = { nombre: g("nombre"), email: g("email"), nivel: g("nivel"), modalidad: g("modalidad"), fecha: g("fecha"), horario: g("horario"), tema: g("materia"), mensaje: g("mensaje") };
@@ -102,45 +102,42 @@
   };
   const texto = (o) => `Hola Paola, soy ${o.nombre}.\n\nCorreo: ${o.email}\nNivel: ${o.nivel || "No especificado"}\nModalidad: ${o.modalidad || "A definir"}\nFecha preferida: ${o.fechaTxt || "A coordinar"}${o.horario ? " a las " + o.horario + " hs" : ""}\nTema: ${o.tema || "No especificado"}\n\nConsulta: ${o.mensaje || "Quisiera consultar por las clases de Química."}`;
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const o = datos(); if (!o) return;
-    if (!wa) { msg.textContent = "Falta configurar el número de WhatsApp en js/config.js."; return; }
-    msg.textContent = "Abriendo WhatsApp…";
-    window.open(waUrl(texto(o)), "_blank", "noopener");
-    form.reset();
-  });
-
   const EJ = S.emailjs || {};
   const ejOk = !!(EJ.publicKey && EJ.serviceId && EJ.templatePaola && EJ.templateAlumno);
   const ejSend = (tpl, params) => fetch("https://api.emailjs.com/api/v1.0/email/send", {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ service_id: EJ.serviceId, template_id: tpl, user_id: EJ.publicKey, template_params: params })
   }).then((r) => { if (!r.ok) throw new Error("emailjs"); });
-  if (ejOk) mailBtn.textContent = "Solicitar clase por correo";
+  const aviso = (t, ok) => { msg.textContent = t; msg.classList.toggle("ok", !!ok); };
+  if (!ejOk && !S.formEndpoint && !S.email) pendientes.push("emailjs (el envío por correo no funciona hasta configurarlo)");
 
-  if (!S.email && !S.formEndpoint && !ejOk) { mailBtn.hidden = true; pendientes.push("email (botón de correo oculto)"); }
-  mailBtn.addEventListener("click", async () => {
-    const o = datos(ejOk); if (!o) return;
-    if (ejOk) {
-      const p = { nombre: o.nombre, email: o.email, fecha: o.fechaTxt, horario: o.horario, modalidad: o.modalidad || "A definir", nivel: o.nivel || "No especificado", tema: o.tema || "No especificado", mensaje: o.mensaje || "-", sitio: S.nombre || "" };
-      mailBtn.disabled = true; msg.textContent = "Enviando solicitud…";
-      try {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    aviso("", false);
+    const o = datos(true); if (!o) return;
+    if (!ejOk && !S.formEndpoint && !S.email) {
+      aviso("El envío por correo todavía no está configurado. Escribinos por el botón de WhatsApp.", false); return;
+    }
+    sendBtn.disabled = true; aviso("Enviando solicitud…", false);
+    try {
+      if (ejOk) {
+        const p = { nombre: o.nombre, email: o.email, fecha: o.fechaTxt, horario: o.horario, modalidad: o.modalidad || "A definir", nivel: o.nivel || "No especificado", tema: o.tema || "No especificado", mensaje: o.mensaje || "-", sitio: S.nombre || "" };
         await Promise.all([ejSend(EJ.templatePaola, p), ejSend(EJ.templateAlumno, p)]);
-        msg.textContent = "¡Solicitud enviada! Te llegó un correo con los datos. Paola confirmará la clase.";
-        form.reset();
-      } catch (_) { msg.textContent = "No pudimos enviar la solicitud. Probá por WhatsApp."; }
-      mailBtn.disabled = false; return;
-    }
-    if (S.formEndpoint) {
-      try {
+      } else if (S.formEndpoint) {
         const r = await fetch(S.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(o) });
-        if (!r.ok) throw new Error();
-        msg.textContent = "¡Listo! Recibimos tu consulta y te vamos a responder pronto."; form.reset();
-      } catch (_) { msg.textContent = "No pudimos enviar el mensaje. Probá por WhatsApp."; }
-    } else {
-      location.href = `mailto:${S.email}?subject=${encodeURIComponent("Consulta de clases de Química")}&body=${encodeURIComponent(texto(o))}`;
+        if (!r.ok) throw new Error("form");
+      } else {
+        location.href = `mailto:${S.email}?subject=${encodeURIComponent("Solicitud de clase de Química")}&body=${encodeURIComponent(texto(o))}`;
+        aviso("Se abrió tu programa de correo para enviar la solicitud.", true);
+        sendBtn.disabled = false; return;
+      }
+      const correo = o.email;
+      form.reset();
+      aviso(`¡Solicitud enviada! Te mandamos un correo a ${correo} con los datos de tu clase. Si no lo ves, revisá la carpeta de spam. Paola confirmará la fecha y el horario.`, true);
+    } catch (_) {
+      aviso("No pudimos enviar la solicitud. Probá de nuevo o escribinos por WhatsApp.", false);
     }
+    sendBtn.disabled = false;
   });
 
   if (pendientes.length) console.info("[Landing] Pendientes en js/config.js:\n- " + pendientes.join("\n- "));

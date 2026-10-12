@@ -29,7 +29,7 @@ window.SITE = {
   },
 
   /* CORREOS AUTOMÁTICOS (opcional) con EmailJS — ver README, sección "Reservas por correo".
-     Al completar los 4 datos, el botón "Solicitar clase por correo" envía:
+     Al completar los 4 datos, el botón "Enviar solicitud por correo" envía:
        - un aviso a Paola con todos los datos de la solicitud
        - un correo al alumno con la fecha, el horario, la modalidad y el tema pedidos. */
   emailjs: {
@@ -39,6 +39,8 @@ window.SITE = {
     templateAlumno: ""
   },
 
+
+  
   /* Materias: n = número atómico, s = símbolo, t = nombre. */
   materias: [
     { n: 1,  s: "H",  t: "Química General" },

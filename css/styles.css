@@ -178,3 +178,5 @@ select:focus{outline:none;border-color:var(--ink)}
 }
 @media (max-width:520px){.two{grid-template-columns:1fr}}
 
+
+.hint.ok{color:#0b6535;font-weight:600;background:#e8f6ee;border:1px solid #bfe3cd;padding:12px 14px;border-radius:8px}
