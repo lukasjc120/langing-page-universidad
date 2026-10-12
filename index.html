@@ -31,11 +31,10 @@
 <header id="top">
  <nav class="wrap" aria-label="Principal">
   <a class="brand" href="#inicio"><span class="mini" aria-hidden="true">Pd</span>Paola Díaz</a>
-  <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navlinks" aria-label="Abrir menú">☰</button>
   <div class="navlinks" id="navlinks">
    <a href="#sobre-mi">Sobre mí</a><a href="#materias">Materias</a><a href="#servicios">Servicios</a><a href="#como-funciona">Método</a><a href="#opiniones" id="navOp" hidden>Opiniones</a><a href="#zona">Zona</a><a href="#preguntas">Preguntas</a>
-   <a class="btn" href="#contacto">Consultar</a>
   </div>
+  <div class="nav-right"><a class="btn nav-cta" href="#contacto">Consultar</a><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navlinks" aria-label="Abrir menú">☰</button></div>
  </nav>
 </header>
 
@@ -47,8 +46,7 @@
    <h1>Aprendé Química con confianza.</h1>
    <p class="lead">Clases particulares personalizadas para entender los temas, resolver ejercicios y llegar bien preparado a parciales, finales e ingreso universitario.</p>
    <div class="actions">
-    <a class="btn wa" href="#contacto" data-wa>Consultar por WhatsApp</a>
-    <a class="btn ghost" href="#servicios">Ver clases</a>
+    <a class="btn" href="#servicios">Ver clases y valores</a>
    </div>
    <ul class="trust"><li>Atención personalizada</li><li>A tu ritmo</li><li>Consulta sin compromiso</li></ul>
   </div>
@@ -61,6 +59,8 @@
   </div>
  </div>
 </section>
+
+<div class="ticker" aria-hidden="true"><div class="ticker-track"><span><i>1</i>H</span><span><i>6</i>C</span><span><i>7</i>N</span><span><i>8</i>O</span><span><i>11</i>Na</span><span><i>12</i>Mg</span><span><i>13</i>Al</span><span><i>17</i>Cl</span><span><i>20</i>Ca</span><span><i>26</i>Fe</span><span><i>29</i>Cu</span><span><i>30</i>Zn</span><span><i>46</i>Pd</span><span><i>47</i>Ag</span><span><i>79</i>Au</span><span><i>1</i>H</span><span><i>6</i>C</span><span><i>7</i>N</span><span><i>8</i>O</span><span><i>11</i>Na</span><span><i>12</i>Mg</span><span><i>13</i>Al</span><span><i>17</i>Cl</span><span><i>20</i>Ca</span><span><i>26</i>Fe</span><span><i>29</i>Cu</span><span><i>30</i>Zn</span><span><i>46</i>Pd</span><span><i>47</i>Ag</span><span><i>79</i>Au</span></div></div>
 
 <section class="section" id="sobre-mi" style="background:#fff">
  <div class="wrap about">
@@ -110,6 +110,7 @@
  <div class="wrap">
   <h2>Lo que dicen los estudiantes</h2>
   <div class="quotes" id="quotes"></div>
+  <p class="note" id="opNota" hidden>Los comentarios de esta sección son ejemplos ilustrativos.</p>
  </div>
 </section>
 
@@ -147,7 +148,7 @@
   <div>
    <h2>¿Empezamos a trabajar en tus objetivos?</h2>
    <p class="intro">Contame qué tema de Química estás estudiando y qué necesitás. Paola se pondrá en contacto para coordinar una primera consulta, sin compromiso.</p>
-   <a class="btn ghost" href="#" data-wa>¿Preferís escribir directo? WhatsApp</a>
+   <ol class="next"><li>Enviás tu solicitud por WhatsApp.</li><li>Paola te responde para confirmar día y horario.</li><li>Empezás a estudiar con un plan a tu medida.</li></ol>
   </div>
   <form id="contactForm" novalidate>
    <label>Tu nombre<input name="nombre" required autocomplete="name" placeholder="Cómo te llamás"></label>
@@ -162,15 +163,13 @@
    </div>
    <label>¿Qué tema necesitás estudiar?<input name="materia" placeholder="Ej.: enlaces químicos, estequiometría..."></label>
    <label>Tu consulta<textarea name="mensaje" placeholder="Contame brevemente qué necesitás..."></textarea></label>
-   <button class="btn" type="submit" id="sendBtn">Enviar solicitud por correo</button>
-   <p class="hint" id="formMsg" role="status" aria-live="polite">Te enviaremos un correo con los datos de tu solicitud.</p>
+   <button class="btn" type="submit" id="sendBtn">Enviar por WhatsApp</button>
+   <p class="hint" id="formMsg" role="status" aria-live="polite">Se abrirá WhatsApp con tu mensaje listo para enviar.</p>
   </form>
  </div>
 </section>
 
 </main>
-
-<a class="wa-float" href="#" data-wa aria-label="Escribir por WhatsApp"><span aria-hidden="true">💬</span></a>
 
 <footer>
  <div class="wrap foot"><span>© <span id="year"></span> Prof. Paola Díaz</span><span>Clases particulares de Química · <a href="#top">Volver arriba ↑</a></span></div>
