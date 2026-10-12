@@ -7,7 +7,7 @@
   const set = (sel, html) => { const el = $(sel); if (el) el.innerHTML = html; };
 
   const pendientes = [];
-  const wa = S.whatsapp && S.whatsapp !== "5493810000000" ? S.whatsapp : null; // NO cambiar este número
+  const wa = S.whatsapp && S.whatsapp !== "5493810000000" ? S.whatsapp : null;
   const waUrl = (t) => `https://wa.me/${wa}` + (t ? `?text=${encodeURIComponent(t)}` : "");
   const z = S.zona || {};
 
@@ -53,6 +53,16 @@
   fill("#selNivel", S.niveles, "t");
   fill("#selMod", S.modalidades, "t");
 
+  /* Reservas: fecha y horario */
+  const R = S.reservas || {};
+  const selHor = $("#selHor"), fechaIn = $("#fecha");
+  (R.horarios || []).forEach((h) => selHor.add(new Option(h + " hs", h)));
+  const pad = (n) => String(n).padStart(2, "0");
+  const minDia = new Date(); minDia.setDate(minDia.getDate() + (R.diasAnticipacion == null ? 1 : R.diasAnticipacion));
+  fechaIn.min = `${minDia.getFullYear()}-${pad(minDia.getMonth() + 1)}-${pad(minDia.getDate())}`;
+  const aFecha = (v) => { const [y, m, d] = v.split("-").map(Number); return new Date(y, m - 1, d); };
+  const fmtFecha = (v) => v ? aFecha(v).toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) : "";
+
   /* ---------- WhatsApp ---------- */
   if (!wa) pendientes.push("whatsapp");
   $$("[data-wa]").forEach((a) => {
@@ -77,14 +87,20 @@
 
   /* ---------- Formulario ---------- */
   const form = $("#contactForm"), msg = $("#formMsg"), mailBtn = $("#mailBtn");
-  const datos = () => {
+  const datos = (estricto) => {
     const d = new FormData(form), g = (k) => (d.get(k) || "").toString().trim();
-    const o = { nombre: g("nombre"), email: g("email"), nivel: g("nivel"), modalidad: g("modalidad"), tema: g("materia"), mensaje: g("mensaje") };
+    const o = { nombre: g("nombre"), email: g("email"), nivel: g("nivel"), modalidad: g("modalidad"), fecha: g("fecha"), horario: g("horario"), tema: g("materia"), mensaje: g("mensaje") };
     if (!o.nombre) { msg.textContent = "Por favor, escribí tu nombre."; form.nombre.focus(); return null; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(o.email)) { msg.textContent = "Revisá tu correo: no parece válido."; form.email.focus(); return null; }
+    if (estricto && (!o.fecha || !o.horario)) { msg.textContent = "Elegí una fecha y un horario para enviar la solicitud."; return null; }
+    if (o.fecha) {
+      if (o.fecha < fechaIn.min) { msg.textContent = "Elegí una fecha a partir de mañana."; fechaIn.focus(); return null; }
+      if (R.dias && !R.dias.includes(aFecha(o.fecha).getDay())) { msg.textContent = "Ese día no hay atención. Elegí otro día."; fechaIn.focus(); return null; }
+    }
+    o.fechaTxt = fmtFecha(o.fecha);
     return o;
   };
-  const texto = (o) => `Hola Paola, soy ${o.nombre}.\n\nCorreo: ${o.email}\nNivel: ${o.nivel || "No especificado"}\nModalidad: ${o.modalidad || "A definir"}\nTema: ${o.tema || "No especificado"}\n\nConsulta: ${o.mensaje || "Quisiera consultar por las clases de Química."}`;
+  const texto = (o) => `Hola Paola, soy ${o.nombre}.\n\nCorreo: ${o.email}\nNivel: ${o.nivel || "No especificado"}\nModalidad: ${o.modalidad || "A definir"}\nFecha preferida: ${o.fechaTxt || "A coordinar"}${o.horario ? " a las " + o.horario + " hs" : ""}\nTema: ${o.tema || "No especificado"}\n\nConsulta: ${o.mensaje || "Quisiera consultar por las clases de Química."}`;
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -95,9 +111,27 @@
     form.reset();
   });
 
-  if (!S.email && !S.formEndpoint) { mailBtn.hidden = true; pendientes.push("email (botón de correo oculto)"); }
+  const EJ = S.emailjs || {};
+  const ejOk = !!(EJ.publicKey && EJ.serviceId && EJ.templatePaola && EJ.templateAlumno);
+  const ejSend = (tpl, params) => fetch("https://api.emailjs.com/api/v1.0/email/send", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ service_id: EJ.serviceId, template_id: tpl, user_id: EJ.publicKey, template_params: params })
+  }).then((r) => { if (!r.ok) throw new Error("emailjs"); });
+  if (ejOk) mailBtn.textContent = "Solicitar clase por correo";
+
+  if (!S.email && !S.formEndpoint && !ejOk) { mailBtn.hidden = true; pendientes.push("email (botón de correo oculto)"); }
   mailBtn.addEventListener("click", async () => {
-    const o = datos(); if (!o) return;
+    const o = datos(ejOk); if (!o) return;
+    if (ejOk) {
+      const p = { nombre: o.nombre, email: o.email, fecha: o.fechaTxt, horario: o.horario, modalidad: o.modalidad || "A definir", nivel: o.nivel || "No especificado", tema: o.tema || "No especificado", mensaje: o.mensaje || "-", sitio: S.nombre || "" };
+      mailBtn.disabled = true; msg.textContent = "Enviando solicitud…";
+      try {
+        await Promise.all([ejSend(EJ.templatePaola, p), ejSend(EJ.templateAlumno, p)]);
+        msg.textContent = "¡Solicitud enviada! Te llegó un correo con los datos. Paola confirmará la clase.";
+        form.reset();
+      } catch (_) { msg.textContent = "No pudimos enviar la solicitud. Probá por WhatsApp."; }
+      mailBtn.disabled = false; return;
+    }
     if (S.formEndpoint) {
       try {
         const r = await fetch(S.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(o) });

@@ -9,7 +9,7 @@ window.SITE = {
 
   /* WhatsApp: 54 + 9 + código de área (sin 0) + número (sin 15).
      Sin +, espacios ni guiones. Ejemplo: "5493811234567" */
-  whatsapp: "3813575649",
+  whatsapp: "5493813575649",
   mensajeWhatsapp: "Hola Paola, quisiera consultar por las clases de Química.",
 
   /* Correo (opcional). Si lo completás, aparece el botón "Enviar por correo". */
@@ -18,6 +18,26 @@ window.SITE = {
   /* Formulario por correo sin servidor (opcional): creá un formulario en
      https://formspree.io y pegá acá su URL (https://formspree.io/f/xxxx). */
   formEndpoint: "",
+
+  /* RESERVAS: horarios que se ofrecen en el formulario.
+     dias: días de atención (0 = domingo, 1 = lunes ... 6 = sábado).
+     diasAnticipacion: mínimo de días de anticipación para pedir una clase. */
+  reservas: {
+    horarios: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"],
+    dias: [1, 2, 3, 4, 5, 6],
+    diasAnticipacion: 1
+  },
+
+  /* CORREOS AUTOMÁTICOS (opcional) con EmailJS — ver README, sección "Reservas por correo".
+     Al completar los 4 datos, el botón "Solicitar clase por correo" envía:
+       - un aviso a Paola con todos los datos de la solicitud
+       - un correo al alumno con la fecha, el horario, la modalidad y el tema pedidos. */
+  emailjs: {
+    publicKey: "",
+    serviceId: "",
+    templatePaola: "",
+    templateAlumno: ""
+  },
 
   /* Materias: n = número atómico, s = símbolo, t = nombre. */
   materias: [
