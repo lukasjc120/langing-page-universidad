@@ -80,13 +80,12 @@ window.SITE = {
   notaPrecios: "",
 
   /* Atención presencial. */
-  zona: {
-    ciudad: "",   // Ej.: "San Miguel de Tucumán"
-    zonas: "",    // Ej.: "Centro, Yerba Buena y alrededores"
+    zona: {
+    ciudad: "San Miguel de Tucumán",
+    zonas: "",
     nota: "El lugar exacto se coordina al reservar la clase.",
-    mapaUrl: ""   // Opcional: link de Google Maps de la zona
+    mapaUrl: ""
   },
-
   /* TESTIMONIOS REALES. Mientras esté vacío, la sección no se muestra.
      Agregá solo opiniones auténticas y con autorización de quien las escribió.
      Formato:
